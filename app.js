@@ -3,12 +3,21 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-
+// import the knex library
+const knex = require("knex");
+// import the database connectionstring from the config file
+const { DATABASE_URL } = require("./config");
+// create the knex connection
+const db = knex({
+  client: "pg",
+  connection: DATABASE_URL,
+});
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
-
+const locationsRouter = require("./routes/locations");
 var app = express();
-
+// set the database connection as a variable in the app
+app.set('db', db);
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
@@ -21,6 +30,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.use("/locations", locationsRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
